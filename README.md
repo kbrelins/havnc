@@ -1,18 +1,41 @@
-## Home Assistant Dashboard through VNC
+HAVNC Standalone (Fork)
+This is a customized version of the havnc project by gnyman, optimized to run as a standalone Docker container (e.g., on macOS via OrbStack, Linux) rather than a Home Assistant Add-on.
 
-_Note_: This is a pre-release, it mostly works on my iPad2, most of the time, but unless you want to fiddle I'd wait a bit.
+Summary of Changes
 
+The goal was to eliminate dependencies on Home Assistant supervisor files (options.json) and configure the container to run on ARM64 architecture (Apple Silicon) while maintaining the original functionality provided by Gnyman.
 
-Simple add-on which allows you to view and interact with a dashboard (or any other webpage) through a modern chromium instance inside a noVNC webpage.
+Removed Home Assistant Dependencies:
 
-Very useful in case your browser don't support all the newfangled webstuff but enough to work with older versions of noVNC.
+Updated supervisor configuration files (.conf) to stop looking for /data/options.json.
 
-For example the iPad2.
+Replaced hardcoded HA-specific variables with environment variables passed during docker run.
 
-## Usage
-Clone into your /addons/ folder (you need a way to access that, outside of the scope of this documentation currently). Refresh the addons page and install it.
+Network & Web Access (HTTP Support):
 
-## Tips
-[Kiosk-mode](https://github.com/NemesisRE/kiosk-mode) is really useful for a cleaner look.
+Modified 4-websockify.conf to run in HTTP mode (removed SSL certificate requirements). This enables direct access via http://localhost:8080 without browser warnings, improving compatibility with various VNC clients.
 
-[ha-lcars](https://github.com/th3jesta/ha-lcars) for the one true interface (as seen in my example photo).
+Mouse/Cursor Synchronization (M1/OrbStack fix):
+
+Updated 5-chromium.conf to include flags ensuring the cursor maps correctly to the virtual screen: --force-device-scale-factor=1 and --window-position=0,0.
+
+Configured 1-xvfb.conf to explicitly set the display environment.
+
+No changes to index.html: The original noVNC interface provided by Gnyman was kept intact.
+
+How to run standalone (Docker)
+
+Use the following command to run the container. Adjust HA_URL to point to your Home Assistant instance.
+
+Bash
+docker run -d \
+  --name ha-vnc-dashboard \
+  --restart=unless-stopped \
+  -p 8080:8080 \
+  -e RESOLUTION="1024x768" \
+  -e RESOLUTION_COMMAS="1024,768" \
+  -e VNC_PASSWORD="1" \
+  -e HA_URL="http://YOUR_HA_IP:8123" \
+  -e DISPLAY=":0" \
+  YOUR_GITHUB_USERNAME/havnc:latest
+Access the dashboard via: http://localhost:8080/?password=1
