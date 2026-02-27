@@ -16,6 +16,16 @@ The goal was to eliminate dependencies on Home Assistant supervisor files (`opti
     * Configured `1-xvfb.conf` to explicitly set the display environment.
 4.  **No changes to `index.html`**: The original noVNC interface provided by Gnyman was kept intact.
 
+## Technical Details
+
+* **Base OS**: Alpine Linux 3.19
+* **VNC Server**: TigerVNC (`x0vncserver`)
+* **Web VNC Client**: noVNC v0.5.1
+* **Web Proxy**: Websockify
+* **Browser**: Chromium (latest available in Alpine 3.19 repositories, running in `--kiosk` mode)
+* **Window Manager**: Openbox
+* **Display Server**: Xvfb
+
 ## How to run standalone (Docker)
 
 Use the following command to run the container. Adjust `HA_URL` to point to your Home Assistant instance.
